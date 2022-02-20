@@ -1,0 +1,15 @@
+# All units in SI
+body:
+  height: 0.833445 # metres
+  width: 0.5 # metres
+  length: 0.5 # metres
+  mass: 7.659 # kilogram
+
+wheel:
+  radius: 0.1725 # metres
+  thickness: 0.1 # metres
+  mass: 2.324 # kilogram
+  training: false
+
+joint_state:
+  rate: 100.0 # Hz

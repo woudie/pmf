@@ -8,7 +8,6 @@ project(pmf_description)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  gazebo
   joint_state_publisher_gui
   robot_state_publisher
   roslaunch
@@ -110,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES pmf_description
-#  CATKIN_DEPENDS gazebo joint_state_publisher_gui robot_state_publisher roslaunch rviz tf urdf xacro
+#  CATKIN_DEPENDS joint_state_publisher_gui robot_state_publisher roslaunch rviz tf urdf xacro
 #  DEPENDS system_lib
 )
 

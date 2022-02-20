@@ -1,54 +1,50 @@
 <?xml version="1.0"?>
 <robot name="pmf" xmlns:xacro="http://www.ros.org/wiki/xacro">
+  <!-- CONSTANTS -->
   <xacro:property name="PI" value="3.1415926535897931" />
+  
+  <!-- LINKED PARAMS -->
+  <xacro:property name="package_name" value="$(arg robot_name)_description" />
 
-  <xacro:arg name="pub_ground_truth" default="0" />
-  <xacro:arg name="auto_reset_orientation" default="0" />
-  <xacro:arg name="auto_reset_delay" default="2.0" />
+  <xacro:property name="robot_yaml" value="$(find ${package_name})/config/robot.yaml" />
+  <xacro:property name="robot_params" value="${xacro.load_yaml(robot_yaml)}" />
 
-  <xacro:arg name="wheel_mass" default="1.0" />
-  <xacro:arg name="wheel_radius" default="0.2" />
-  <xacro:arg name="body_mass" default="10.0" />
-  <xacro:arg name="body_width" default="0.3" />
-  <xacro:arg name="body_depth" default="0.3" />
-  <xacro:arg name="body_length" default="0.8" />
-  <xacro:arg name="training_wheels" default="false" />
+  <xacro:property name="simulation_yaml" value="$(find ${package_name})/config/simulation.yaml" />
+  <xacro:property name="sim_params" value="${xacro.load_yaml(simulation_yaml)}" />
 
-  <xacro:property name="wheel_mass" value="$(arg wheel_mass)" />
-  <xacro:property name="wheel_radius" value="$(arg wheel_radius)" />
-  <xacro:property name="wheel_thickness" value="0.1" />
-  <xacro:property name="wheelbase" value="${body_width + (wheel_thickness/2)*2}" />
-  <xacro:property name="body_mass" value="$(arg body_mass)" />
-  <xacro:property name="body_width" value="$(arg body_width)" />
-  <xacro:property name="body_depth" value="$(arg body_depth)" />
-  <xacro:property name="body_length" value="$(arg body_length)" />
+  <xacro:property name="body_mass" value="${robot_params['body']['mass']}" />
+  <xacro:property name="body_width" value="${robot_params['body']['width']}" />
+  <xacro:property name="body_length" value="${robot_params['body']['length']}" />
+  <xacro:property name="body_height" value="${robot_params['body']['height']}" />
+  <xacro:property name="wheel_mass" value="${robot_params['wheel']['mass']}" />
+  <xacro:property name="wheel_radius" value="${robot_params['wheel']['radius']}" />
+  <xacro:property name="wheel_thickness" value="${robot_params['wheel']['thickness']}" />
+  <xacro:property name="wheelbase" value="${body_width + 0.2}" />  
 
   <gazebo>
     <plugin name="hector_gazebo_imu" filename="libhector_gazebo_ros_imu.so">
-      <bodyName>body_com</bodyName>
+      <bodyName>chassis_link</bodyName>
       <topicName>imu</topicName>
       <gaussianNoise>0.0</gaussianNoise>
       <xyzOffset>0 0 0</xyzOffset>
       <rpyOffset>0 0 0</rpyOffset>
     </plugin>
-    <plugin name="teeterbot_interface" filename="libteeterbot_gazebo_plugin.so">
-      <pubGroundTruth>$(arg pub_ground_truth)</pubGroundTruth>
-      <autoResetOrientation>$(arg auto_reset_orientation)</autoResetOrientation>
-      <autoResetDelay>$(arg auto_reset_delay)</autoResetDelay>
-      <bodyLength>$(arg body_length)</bodyLength>
-      <voltageMode>$(arg voltage_mode)</voltageMode>
-      <torqueMode>$(arg torque_mode)</torqueMode>
-      <speedMode>$(arg speed_mode)</speedMode>
+    <plugin name="pmf_interface" filename="libpmf_simulation_plugin.so">
+      <pubGroundTruth>${sim_params['pub_ground_truth']}</pubGroundTruth>
+      <autoResetOrientation>${sim_params['auto_reset_orientation']}</autoResetOrientation>
+      <autoResetDelay>${sim_params['auto_reset_delay']}</autoResetDelay>
+      <bodyHeight>${body_height}</bodyHeight>
+      <controlMode>${sim_params['control_mode']}</controlMode>
     </plugin>
     <plugin name="joint_state_publisher" filename="libgazebo_ros_joint_state_publisher.so">
       <robotNamespace>$(arg robot_name)</robotNamespace>
       <jointName>
           left_wheel_joint, right_wheel_joint
       </jointName>
-      <updateRate>100</updateRate>
+      <updateRate>${robot_params['joint_state']['rate']}</updateRate>
       <alwaysOn>true</alwaysOn>
     </plugin>
-  </gazebo>
+  </gazebo> 
 
   <xacro:macro name="wheel" params="name y_offset z_offset *link_pose">
     <link name="${name}_link">
@@ -61,7 +57,7 @@
       <visual>
         <xacro:insert_block name="link_pose" />
         <geometry>
-          <mesh filename="package://pmf_description/meshes/pmf_wheel.STL"/>
+          <mesh filename="package://${package_name}/meshes/pmf_wheel.STL"/>
         </geometry>
         <material name="black" />
       </visual>
@@ -80,7 +76,7 @@
         <fdir1 value="1 0 0"/>
     </gazebo>
     <joint name="${name}_joint" type="continuous">
-      <origin xyz="0 ${y_offset} 0" rpy="-1.570796 0 0"/>
+      <origin xyz="0 ${y_offset} 0" rpy="-${PI/2} 0 0"/>
       <parent link="base_link"/>
       <child link="${name}_link"/>
       <axis xyz="0 0 1" />
@@ -88,7 +84,7 @@
   </xacro:macro>
 
   <xacro:wheel name="left_wheel" y_offset="${wheelbase/2}" z_offset="-0.03">
-    <origin xyz="0 0.06 -0.37" rpy="0 3.1415 0"/>
+    <origin xyz="0 0.06 -0.37" rpy="0 ${PI} 0"/>
   </xacro:wheel>
   <xacro:wheel name="right_wheel" y_offset="${-wheelbase/2}" z_offset="0.03">
     <origin xyz="0 0.06 0.37" rpy="0 0 0"/>
@@ -98,19 +94,19 @@
     <inertial>
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <mass value="${body_mass}"/>
-      <inertia ixx="${body_mass/12 * (body_width*body_width + body_length*body_length)}" ixy="0" ixz="0" iyy="${body_mass/12 * (body_length*body_length + body_depth*body_depth)}" iyz="0" izz="${body_mass/12 * (body_width*body_width + body_depth*body_depth)}"/>
+      <inertia ixx="${body_mass/12 * (body_width*body_width + body_height*body_height)}" ixy="0" ixz="0" iyy="${body_mass/12 * (body_height*body_height + body_length*body_length)}" iyz="0" izz="${body_mass/12 * (body_width*body_width + body_length*body_length)}"/>
     </inertial>
     <visual>
-      <origin xyz="0 0 -${body_length/2 - 0.051225}" rpy="0 0 0"/>
+      <origin xyz="0 0 -${body_height/2 - 0.051225}" rpy="0 0 0"/>
       <geometry>
-        <mesh filename="package://pmf_description/meshes/pmf_base.STL"/>
+        <mesh filename="package://${package_name}/meshes/pmf_base.STL"/>
       </geometry>
       <material name="orange"/>
     </visual>
     <collision name="chassis_collision">
       <origin xyz="0 0 0" rpy="0 0 0"/>
       <geometry>
-        <box size="${body_depth} ${body_width} ${body_length}"/>
+        <box size="${body_length} ${body_width} ${body_height}"/>
       </geometry>
     </collision>
   </link>
@@ -122,7 +118,7 @@
   </gazebo>
 
   <link name="base_link">
-    <xacro:if value="$(arg training_wheels)">
+    <xacro:if value="${robot_params['wheel']['training']}">
       <collision name="training_wheel_1">
         <origin xyz="1 0 ${0.025-wheel_radius}" rpy="0 0 0"/>
         <geometry>
@@ -139,7 +135,7 @@
   </link>
 
   <joint name="chassis_joint" type="fixed">
-    <origin xyz="0 0 ${body_length/2}" rpy="0 0 0"/>
+    <origin xyz="0 0 ${body_height/2}" rpy="0 0 0"/>
     <parent link="base_link"/>
     <child link="chassis_link"/>
   </joint>

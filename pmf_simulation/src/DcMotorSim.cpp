@@ -1,6 +1,6 @@
-#include "include/pmf_simulation/DcMotorSim.h"
+#include "pmf_simulation/DcMotorSim.h"
 
-namespace teeterbot_gazebo
+namespace pmf_simulation
 {
 
 DcMotorSim::DcMotorSim(ros::NodeHandle n,
@@ -8,13 +8,17 @@ DcMotorSim::DcMotorSim(ros::NodeHandle n,
                        const gazebo::physics::LinkPtr &link)
 {
   joint_ = joint;
-  props_.inductance = 0.0025;
-  props_.resistance = 0.5;
-  props_.torque_constant = 0.35;
-  props_.max_current = 30.0;
+  ros::param::get("/Motor/inductance", props_.inductance);
+  ros::param::get("/Motor/resistance", props_.resistance);
+  ros::param::get("/Motor/torque_constant", props_.torque_constant);
+  ros::param::get("/Motor/backemf_constant", props_.backemf_constant);
+  ros::param::get("/Motor/max_current", props_.max_current);
+  ros::param::get("/Motor/max_voltage", props_.max_voltage);
+
   current_ = 0.0;
 }
 
+// TODO: Improve motor simulation w/ additional constants and saturation effects
 void DcMotorSim::step(double ts, double voltage_in, double load_torque)
 {
   current_ += ts / props_.inductance * (voltage_in - props_.resistance * current_ - props_.torque_constant * joint_->GetVelocity(0));

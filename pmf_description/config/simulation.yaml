@@ -1,0 +1,7 @@
+training_wheels: false # 
+pub_ground_truth: 0
+auto_reset_orientation: 1
+auto_reset_delay: 2.0 # Length of time before reset occurs
+
+# 0 - Voltage, 1 - Speed, 2 - Effort/Torque
+control_mode: 1 # This will select the appropriate PID controller to use

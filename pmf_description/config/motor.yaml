@@ -1,0 +1,8 @@
+Motor:
+  name: 775pro
+  inductance: 0.0025 # Motor inductance (in H)
+  resistance: 0.5 # Motor winding resistance (in Ω)
+  torque_constant: 0.35 # Motor Torque Constant (in N*m/A)
+  backemf_constant: 0 # Motor Back EMF constatn (in N*m/A)
+  max_current: 30.0 # Maximum current limit (in A)
+  max_voltage: 12 # Maximum voltage limit (in V)

@@ -3,9 +3,9 @@ controllers: # PID controller params for simulation (currently for gazebo)
     left:
       speed: # Speed control PID parameters
         ramp_limit: 50.0
-        kp: 3.0
-        ki: 2.0
-        kd: 0.0
+        kp: 85.0
+        ki: 0.0
+        kd: 2500.0
       torque: # Torque control PID parameters
         ramp_limit: 1000.0
         kp: 10.0
@@ -15,9 +15,9 @@ controllers: # PID controller params for simulation (currently for gazebo)
     right:
       speed: # Speed control PID parameters
         ramp_limit: 50.0
-        kp: 3.0
-        ki: 2.0
-        kd: 0.0
+        kp: 85.0
+        ki: 0.0
+        kd: 2500.0
       torque: # Torque control PID parameters
         ramp_limit: 1000.0
         kp: 10.0

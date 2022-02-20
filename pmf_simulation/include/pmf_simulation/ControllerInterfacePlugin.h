@@ -8,7 +8,8 @@
 #include <gazebo/physics/physics.hh>
 #include <tf/transform_broadcaster.h>
 #include <tf/tf.h>
-#include <teeterbot_gazebo/NudgeTeeterbot.h>
+#include <pmf_simulation/Nudge.h>
+#include <pmf_simulation/AngularDisturbance.h>
 
 #include "MotorController.h"
 #include "DcMotorSim.h"
@@ -27,7 +28,7 @@ protected:
     virtual void Reset();
 
 private:
-    bool nudgeCb(teeterbot_gazebo::NudgeTeeterbotRequest& req, teeterbot_gazebo::NudgeTeeterbotResponse& res);
+    bool nudgeCb(pmf_simulation::NudgeRequest& req, pmf_simulation::NudgeResponse& res);
     void OnUpdate ( const common::UpdateInfo &info );
     void data100Cb ( const ros::TimerEvent &event );
     void recvMotorCmd ( const std_msgs::Float64ConstPtr &msg, int side );
@@ -56,12 +57,12 @@ private:
     physics::LinkPtr body_link_;
 
     // DC motor simulation instances
-    boost::shared_ptr<teeterbot_gazebo::DcMotorSim> left_motor_;
-    boost::shared_ptr<teeterbot_gazebo::DcMotorSim> right_motor_;
+    boost::shared_ptr<pmf_simulation::DcMotorSim> left_motor_;
+    boost::shared_ptr<pmf_simulation::DcMotorSim> right_motor_;
 
     // Controller instances
-    boost::shared_ptr<teeterbot_gazebo::MotorController> left_control_;
-    boost::shared_ptr<teeterbot_gazebo::MotorController> right_control_;
+    boost::shared_ptr<pmf_simulation::MotorController> left_control_;
+    boost::shared_ptr<pmf_simulation::MotorController> right_control_;
 
     // Status properties
     bool fallen_over_;
@@ -81,10 +82,12 @@ private:
     math::Vector3 nudge_offset_;
 #endif
 
-    // Control mode
-    bool voltage_mode_;
-    bool torque_mode_;
-    bool speed_mode_;
+    /* Control Modes
+        0 == Voltage/Openloop mode
+        1 == Speed mode
+        2 == Effort/Torque mode
+     */
+    int control_mode_;
 
     // SDF parameters
     bool pub_ground_truth_;

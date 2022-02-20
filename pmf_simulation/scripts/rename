@@ -1,0 +1,24 @@
+#!/bin/bash
+set -a
+
+usage() {
+   echo -e "Rename the robot, this includes instances of the robtos name in code and filename"
+   echo -e "\nUsage:\t\tfindreplace\t\t[current_name] [new_name]"
+   echo -e "\t\tfindreplacename\t\t[current_name] [new_name]"
+   echo -e "\n\t\t[current_name]\t\tThe current name of the robot. Can be seen in code or from filenames"
+   echo -e "\t\t[new_name]\t\tThe new desired name"
+}
+
+function findreplace() {
+    grep -lr -e "$1" * | xargs sed -i "s/$1/$2/g" ;
+}
+
+function findreplacefilename() {
+    find . -depth -name "*$1*" -exec bash -c 'for f; do base=${f##*/}; mv -- "$f" "${f%/*}/${base//'$1'/'$2'}"; done' _ {} +
+}
+
+export -f findreplace findreplacefilename
+
+echo -e "\e[33mNow run 'source ${PWD}'\e[0m\n"
+usage
+

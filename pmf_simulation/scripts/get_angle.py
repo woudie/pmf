@@ -26,8 +26,8 @@ class GazeboLinkPose:
 
 if __name__ == '__main__':
   try:
-    rospy.init_node('teeterbot_gazebo_angle', anonymous=True)
-    gp = GazeboLinkPose('teeterbot::base_link')
+    rospy.init_node('pmf_gazebo_angle', anonymous=True)
+    gp = GazeboLinkPose('pmf::base_link')
     publish_rate = rospy.get_param('~publish_rate', 50)
 
     rate = rospy.Rate(publish_rate)

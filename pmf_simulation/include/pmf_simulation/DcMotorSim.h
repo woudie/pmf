@@ -4,14 +4,16 @@
 #include <ros/ros.h>
 #include <gazebo/physics/physics.hh>
 
-namespace teeterbot_gazebo
+namespace pmf_simulation
 {
 
 typedef struct {
     double inductance;
     double resistance;
     double torque_constant;
+    double backemf_constant;
     double max_current;
+    double max_voltage;
 } DcMotorProps;
 
 class DcMotorSim

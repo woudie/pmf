@@ -1,0 +1,19 @@
+<launch>
+  <!-- Robot name and description -->
+  <arg name="robot_name" default="pmf" />
+  <param name="robot_description" command="$(find xacro)/xacro '$(find pmf_description)/urdf/pmf.urdf.xacro' robot_name:=$(arg robot_name) --inorder" />
+  
+  <!-- Coupled with joint state publisher -->
+  <node name="joint_state_publisher_gui" pkg="joint_state_publisher_gui" type="joint_state_publisher_gui"  >
+        <param name="use_gui" value="True" />
+  </node>
+  
+  <!-- Publish TF frames within URDF model -->
+  <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" value="50.0" />
+  </node>
+  
+  <!-- RVIZ startup -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find pmf_description)/rviz/pmf.rviz" />
+
+</launch>

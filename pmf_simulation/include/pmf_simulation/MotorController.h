@@ -4,9 +4,9 @@
 #include <ros/ros.h>
 #include <std_msgs/Float64.h>
 #include <dynamic_reconfigure/server.h>
-#include <teeterbot_gazebo/MotorControlConfig.h>
+#include <pmf_simulation/MotorControlConfig.h>
 
-namespace teeterbot_gazebo
+namespace pmf_simulation
 {
 
 class MotorController

@@ -7,8 +7,8 @@ from geometry_msgs.msg import Pose
 import tf
 import numpy as np
 
-pub_left = rospy.Publisher('/teeterbot/left_speed_cmd', Float64, queue_size=10)
-pub_right = rospy.Publisher('/teeterbot/right_speed_cmd', Float64, queue_size=10)
+pub_left = rospy.Publisher('/pmf/left_speed_cmd', Float64, queue_size=10)
+pub_right = rospy.Publisher('/pmf/right_speed_cmd', Float64, queue_size=10)
 
 error_sum = 0;
 prev_error = 0;
@@ -65,9 +65,9 @@ def target(data):
 
 def listener():
 
-    rospy.init_node('teeterbot_pid_controller', anonymous=True)
+    rospy.init_node('pid_controller', anonymous=True)
 
-    rospy.Subscriber("/gazebo/teeterbot_base_link", Pose , controller)
+    rospy.Subscriber("/gazebo/pmf_base_link", Pose , controller)
     rospy.Subscriber("/set_angle", Float64 , target)
 
     rospy.spin()
